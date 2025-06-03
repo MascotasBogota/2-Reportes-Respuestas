@@ -49,7 +49,18 @@ execute a file from the terminal. This is because python3 calls directly the
 python interpreter in the machine. This can lead to dependecy problems (speaking
 from experience)
 
-### installing dependencies
+### .env file
+
+You have to create a .env file that contains:
+
+```env
+FLASK_APP=app.py
+FLASK_ENV=development
+```
+
+### initalizing without docker
+
+#### installing dependencies
 
 A `requirements.txt` file should exitst among the files. Just use
 
@@ -57,9 +68,29 @@ A `requirements.txt` file should exitst among the files. Just use
 pip install -r requirements.txt
 ```
 
+#### running the app
+
+Once all of the above is done, go to the root directory and execute the `app.py`
+file:
+
+```bash
+python app.py
+```
+
 ### Using docker
+
+> You have to install docker beforehand
 
 Docker serves the purpose of running the application in a container. That is, a
 minimalist version of an operating system is created and the application runs on
 top of it. This is to avoid issues with hardware and operating system
 environment in each of the team member's PC (it works in my machine! issue).
+
+There is a dockerfile that defines layer by layer the configuration of the
+container, and a docker-compose.yml that automatizes the process.
+
+To start the docker container just do:
+
+```bash
+docker compose up
+```
