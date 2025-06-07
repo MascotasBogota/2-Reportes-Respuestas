@@ -53,9 +53,12 @@ from experience)
 
 You have to create a .env file that contains:
 
-```env
+```
 FLASK_APP=app.py
 FLASK_ENV=development
+MONGO_URI=mongodb+srv://<username>:<password>@reportes-respuestas.ntzkwtx.mongodb.net/?retryWrites=true&w=majority&appName=reportes-respuestas
+JWT_PUBLIC_KEY="-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq...\n-----END PUBLIC KEY-----"
+DEV_MODE=True
 ```
 
 ### initalizing without docker
