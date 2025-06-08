@@ -5,10 +5,14 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Copia los archivos del proyecto al contenedor
-COPY . /app
-
+COPY ./requirements.txt /app/requirements.txt
 # Instala las dependencias
 RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . /app
+
+
+
 
 # Evita que Python haga buffering de logs
 ENV PYTHONUNBUFFERED=1
