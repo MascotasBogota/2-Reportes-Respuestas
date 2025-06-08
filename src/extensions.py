@@ -1,6 +1,5 @@
 from flask_restx import Api
 from mongoengine import connect
-from flask import current_app
 
 api = Api(   
    #Inicialización de la API de PatitasBog    

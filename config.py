@@ -15,3 +15,7 @@ class DevelopmentConfig(Config):
 class TestingConfig(Config):
     TESTING = True
     MONGO_URI = os.getenv("MONGO_TEST_URI", "mongodb://localhost:27017/pet_reports_test")
+
+class ProductionConfig(Config):
+    DEBUG = False
+    TESTING = False
