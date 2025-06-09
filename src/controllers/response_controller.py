@@ -1,6 +1,6 @@
 from flask import jsonify, request
 from src.services.response_service import create_response_service, ServiceError
-#from src.utils.auth import get_current_user_id
+from src.utils.auth import get_current_user_id
 
 def add_response_controller(report_id):
     user_id = get_current_user_id()
