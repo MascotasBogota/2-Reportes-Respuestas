@@ -19,6 +19,7 @@ report_input = ns.model('ReportInput', {
 
 @ns.route("/")
 class ReportCreate(Resource):
+    #@jwt_required()
     @ns.expect(report_input)
     @ns.response(201, "Reporte creado exitosamente")
     @ns.response(400, "Faltan campos obligatorios o el formato es incorrecto")
@@ -30,6 +31,7 @@ class ReportCreate(Resource):
 
 @ns.route("/<string:report_id>")
 class ReportUpdateDelete(Resource):
+    #@jwt_required()
     @ns.expect(report_input)
     @ns.response(200, "Reporte actualizado")
     def put(self, report_id):
@@ -44,19 +46,8 @@ class ReportUpdateDelete(Resource):
 
 @ns.route("/<string:report_id>/close")
 class ReportClose(Resource):
+    #@jwt_required()
     @ns.response(200, "Reporte cerrado exitosamente")
     def post(self, report_id):
         """Marcar reporte como 'Encontrado'"""
         return report_controller.close_report_controller(report_id)
-
-@ns.route("/pingdb")
-class PingDB(Resource):
-    def get(self):
-        """Verifica conexión a la base de datos"""
-        from src.models.report_model import Report
-        try:
-            # intenta contar documentos (aunque no haya ninguno aún)
-            count = Report.objects.count()
-            return {"status": "OK", "reports_in_db": count}, 200
-        except Exception as e:
-            return {"status": "ERROR", "error": str(e)}, 500
