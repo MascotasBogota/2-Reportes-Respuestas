@@ -52,13 +52,6 @@ class ReportClose(Resource):
         """Marcar reporte como 'Encontrado'"""
         return report_controller.close_report_controller(report_id)
 
-@ns.route("/public")
-class PublicReportList(Resource):
-    @ns.response(200, "Lista de reportes públicos")
-    def get(self):
-        """Visualizar todos los reportes (público)"""
-        return report_controller.get_all_public_reports_controller()
-
 @ns.route("/public/<string:report_id>")
 class PublicReportDetail(Resource):
     @ns.response(200, "Reporte encontrado")
@@ -67,3 +60,16 @@ class PublicReportDetail(Resource):
     def get(self, report_id):
         """Obtener un reporte público por su ID"""
         return report_controller.get_report_by_id_controller(report_id)
+
+@ns.route("/public")
+class PublicReportList(Resource):
+    @ns.doc(params={
+        'type': 'Filtrar por tipo de mascota (perro, gato, otro)',
+        'lng': 'Longitud (para filtro geográfico)',
+        'lat': 'Latitud (para filtro geográfico)',
+        'radius': 'Radio en metros (para filtro geográfico)'
+    })
+    @ns.response(200, "Lista de reportes públicos filtrados")
+    def get(self):
+        """Visualizar reportes públicos con filtros opcionales"""
+        return report_controller.get_filtered_reports_controller()
