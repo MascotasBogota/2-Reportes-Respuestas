@@ -1,6 +1,8 @@
 from flask import jsonify, request
 from src.services.response_service import create_response_service, ServiceError
 from src.utils.auth import get_current_user_id
+from src.utils.serialization import serialize_response
+
 
 def add_response_controller(report_id):
     user_id = get_current_user_id()
@@ -10,7 +12,7 @@ def add_response_controller(report_id):
     data = request.get_json() or {}
     try:
         result = create_response_service(report_id, data, user_id)
-        return jsonify(result), 201
+        return serialize_response(result), 201
 
     except ServiceError as se:
         # Errores controlados (404, 403, 400 según mensaje)
@@ -24,5 +26,5 @@ def add_response_controller(report_id):
         # fallback
         return {'message': msg}, 400
 
-    except Exception:
-        return {'message': 'Error interno al crear respuesta'}, 500
+    except Exception as e:
+        return {'message': str(e)}, 500

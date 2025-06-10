@@ -27,4 +27,4 @@ def create_response_service(report_id: str, data: dict, user_id: str) -> dict:
         location=data.get('location')
     )
     resp.save()
-    return resp.to_mongo().to_dict()
+    return resp
