@@ -2,6 +2,8 @@ from src.models.response_model import Response
 from src.models.report_model import Report
 #from src.utils.auth import verify_user_exists
 from mongoengine import DoesNotExist
+from src.utils.serialization import serialize_response
+
 
 class ServiceError(Exception): pass
 
@@ -34,3 +36,19 @@ def create_response_service(report_id: str, data: dict, user_id: str) -> dict:
     )
     resp.save()
     return resp
+
+def get_response_service(report_id: str, response_id: str) -> dict:
+    # 1) Verificar que el reporte existe 
+    try:
+        report = Report.objects.get(id=report_id)
+    except DoesNotExist:
+        raise ServiceError('Reporte no encontrado')
+
+    # 3) Obtener la respuesta por ID
+    try:
+        response = Response.objects.get(id=response_id, report_id=report_id)
+    except DoesNotExist:
+        raise ServiceError('Respuesta no encontrada')
+    
+    response = serialize_response(response)
+    return response 

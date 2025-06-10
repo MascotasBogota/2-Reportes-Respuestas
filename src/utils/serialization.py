@@ -18,17 +18,27 @@ def serialize_report(report):
     return doc
 
 def serialize_response(response):
+    print("serializin")
     if hasattr(response, "to_mongo"):
         doc = response.to_mongo().to_dict()
     else:
-        doc = dict(response)  # por si acaso
+        doc = dict(response)
+    
+    print(doc)
 
-    doc["_id"] = str(response.id)  # ObjectId a str
+    # Reemplazar _id por id
+    doc["id"] = str(doc.pop("_id"))
 
-    for key, value in doc.items():
-        if isinstance(value, datetime):
-            doc[key] = value.isoformat()
-        elif isinstance(value, ObjectId):
-            doc[key] = str(value)
+    def convert(value):
+        if isinstance(value, ObjectId):
+            return str(value)
+        elif isinstance(value, datetime):
+            return value.isoformat()
+        elif isinstance(value, list):
+            return [convert(item) for item in value]
+        elif isinstance(value, dict):
+            return {k: convert(v) for k, v in value.items()}
+        else:
+            return value
 
-    return doc
+    return {k: convert(v) for k, v in doc.items()}

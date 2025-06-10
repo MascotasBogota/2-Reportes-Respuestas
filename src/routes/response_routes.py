@@ -1,5 +1,5 @@
 from flask_restx import fields, Namespace, Resource
-from src.controllers.response_controller import add_response_controller
+from src.controllers.response_controller import add_response_controller, get_response_service
 from src.extensions import api
 
 ns = Namespace('responses', description='Respuestas a reportes')
@@ -15,9 +15,11 @@ response_model = api.model('ResponseCreate', {
     }))
 })
 
+
+
 @ns.route('/<string:report_id>')
 @ns.param('report_id', 'ID del reporte al que se responde')
-class ResponseListResource(Resource):
+class ResponseCreate(Resource):
     @ns.expect(response_model)
     @ns.response(201, 'Respuesta creada exitosamente')
     @ns.response(400, 'Solicitud inválida')
@@ -26,3 +28,12 @@ class ResponseListResource(Resource):
     @ns.response(404, 'Reporte no encontrado')
     def post(self, report_id):
         return add_response_controller(report_id)
+
+@ns.route('/<string:report_id>/<string:response_id>')
+@ns.param('report_id', 'ID del reporte')
+@ns.param('response_id', 'ID de la respuesta que se visualiza')
+class ResponseGetOne(Resource):
+    @ns.response(200, 'Respuesta obtenida exitosamente')
+    @ns.response(404, 'Reporte no encontrado')
+    def get(self, report_id,response_id):
+        return get_response_service(report_id, response_id)
