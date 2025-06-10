@@ -3,6 +3,7 @@ from flask_restx import abort
 from src.services import report_service
 from src.utils.auth import get_current_user_id
 from src.utils.serialization import serialize_report
+from mongoengine.errors import ValidationError, DoesNotExist
 
 def create_report_controller():
     data = request.json
@@ -31,3 +32,18 @@ def close_report_controller(report_id):
     if not report:
         abort(403, "No autorizado o el reporte ya está cerrado")
     return serialize_report(report), 200
+
+def get_all_public_reports_controller():
+    reports = report_service.get_all_reports()
+    return [serialize_report(r) for r in reports], 200
+
+
+
+def get_report_by_id_controller(report_id):
+    try:
+        report = report_service.get_report_by_id(report_id)
+        if not report:
+            abort(404, "Reporte no encontrado")
+        return serialize_report(report), 200
+    except (ValidationError, DoesNotExist):
+        abort(400, "ID inválido")

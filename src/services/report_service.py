@@ -39,3 +39,10 @@ def close_report(report_id, user_id):
     report.closed_at = datetime.utcnow()
     report.save()
     return report
+
+def get_all_reports():
+    return Report.objects
+
+def get_report_by_id(report_id):
+    return Report.objects(id=report_id).first()
+

@@ -51,3 +51,19 @@ class ReportClose(Resource):
     def post(self, report_id):
         """Marcar reporte como 'Encontrado'"""
         return report_controller.close_report_controller(report_id)
+
+@ns.route("/public")
+class PublicReportList(Resource):
+    @ns.response(200, "Lista de reportes públicos")
+    def get(self):
+        """Visualizar todos los reportes (público)"""
+        return report_controller.get_all_public_reports_controller()
+
+@ns.route("/public/<string:report_id>")
+class PublicReportDetail(Resource):
+    @ns.response(200, "Reporte encontrado")
+    @ns.response(400, "ID inválido")
+    @ns.response(404, "Reporte no encontrado")
+    def get(self, report_id):
+        """Obtener un reporte público por su ID"""
+        return report_controller.get_report_by_id_controller(report_id)
