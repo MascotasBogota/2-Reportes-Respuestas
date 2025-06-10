@@ -8,6 +8,7 @@ ns = Namespace('responses', description='Respuestas a reportes')
 response_model = api.model('ResponseCreate', {
     'type': fields.String(required=True, description='"avistamiento" o "hallazgo"', example='avistamiento'),
     'comment': fields.String(required=True, description='Descripción del avistamiento', example='Lo vi cerca del parque'),
+    'images': fields.List(fields.String, required=False, description='Lista de URLs de imágenes opcional', example=['http://example.com/image1.jpg', 'http://example.com/image2.jpg']),
     'location': fields.Nested(api.model('Point', {
         'type': fields.String(required=True, example='Point'),
         'coordinates': fields.List(fields.Float, required=True, example=[-74.03, 4.67])

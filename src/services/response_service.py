@@ -13,6 +13,11 @@ def create_response_service(report_id: str, data: dict, user_id: str) -> dict:
         raise ServiceError('Reporte no encontrado')
     if report.status != 'open':
         raise ServiceError('No se pueden agregar respuestas a un reporte cerrado')
+    
+    # Forzar imagen para hallazgos
+
+    if data['type'] == 'hallazgo' and not data.get('images'):
+        raise ServiceError('Los hallazgos deben incluir al menos una imagen')
 
     # 2) Verificar que user_id existe (modo producción)
     #if not verify_user_exists(user_id):
@@ -24,6 +29,7 @@ def create_response_service(report_id: str, data: dict, user_id: str) -> dict:
         resp_user_id=user_id,
         type=data['type'],
         comment=data['comment'],
+        images=data.get('images', []),  # Lista de URLs de imágenes opcional
         location=data.get('location')
     )
     resp.save()
