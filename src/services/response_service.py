@@ -2,7 +2,7 @@ from src.models.response_model import Response
 from src.models.report_model import Report
 #from src.utils.auth import verify_user_exists
 from mongoengine import DoesNotExist
-from src.utils.serialization import serialize_response
+import datetime as dt
 
 
 class ServiceError(Exception): pass
@@ -50,5 +50,45 @@ def get_response_service(report_id: str, response_id: str) -> dict:
     except DoesNotExist:
         raise ServiceError('Respuesta no encontrada')
     
-    response = serialize_response(response)
     return response 
+
+def get_all_responses_service(report_id: str):
+    try:
+        report = Report.objects.get(id=report_id)
+    except DoesNotExist:
+        raise ServiceError('Reporte no encontrado')
+    try:
+        response = Response.objects(report_id=report_id)
+    except DoesNotExist:
+        raise ServiceError('No hay ninguna respuesta para este reporte')
+
+    return response
+
+def update_response_service(report_id:str,response_id:str,data: dict, user_id: str):
+    try: #verificar existencia de la respuesta
+        response = Response.objects.get(id=response_id,report_id=report_id)
+    except DoesNotExist:
+        raise ServiceError('Respuesta no encontrada')
+
+    try: # verificar que el reporte este abierto
+        report = Report.objects.get(id=report_id)
+        if report.status != 'open':
+            raise ServiceError("No se pueden cambiar respuestas de un reporte cerrado")
+    except DoesNotExist:
+        raise ServiceError("Reporte no encontrado")
+    
+    # verificar que el usuario sea el mismo en ambos casos
+    if response.resp_user_id != report.user_id:
+        raise ServiceError('Usuarios solo pueden modificar sus propias respuestas')
+    
+    #hacer los cambios
+    response.type = data.get('type', response.type)
+    response.comment = data.get('comment', response.comment)
+    response.location = data.get('location', response.location)
+    response.images = data.get('images', response.images)
+    response.updated_at = dt.datetime.utcnow()
+    response.save()
+    return response
+
+def delete_response_service(report_id:str,response_id:str,user_id: str):
+    pass

@@ -1,5 +1,5 @@
 from flask_restx import fields, Namespace, Resource
-from src.controllers.response_controller import add_response_controller, get_response_service
+from src.controllers.response_controller import add_response_controller, get_response_controller,get_all_responses_controller, update_response_controller, delete_response_controller
 from src.extensions import api
 
 ns = Namespace('responses', description='Respuestas a reportes')
@@ -36,4 +36,37 @@ class ResponseGetOne(Resource):
     @ns.response(200, 'Respuesta obtenida exitosamente')
     @ns.response(404, 'Reporte no encontrado')
     def get(self, report_id,response_id):
-        return get_response_service(report_id, response_id)
+        return get_response_controller(report_id, response_id)
+    
+@ns.route('/<string:report_id>/allResponses')
+@ns.param('report_id', 'ID del reporte')
+class ResponseGetAll(Resource):
+    @ns.response(200, 'Respuesta obtenida exitosamente')
+    @ns.response(404, 'Reporte no encontrado')
+    def get(self, report_id):
+        return get_all_responses_controller(report_id)
+
+@ns.route('/<string:report_id>/<string:response_id>/put')
+@ns.param('report_id', 'ID del reporte correspondiente')
+@ns.param('response_id', 'ID de la respuesta que se va a cambiar')
+class ResponseUpdate(Resource):
+    @ns.expect(response_model)
+    @ns.response(201, 'Respuesta creada exitosamente')
+    @ns.response(400, 'Solicitud inválida')
+    @ns.response(401, 'No autenticado')
+    @ns.response(403, 'Operación no permitida')
+    @ns.response(404, 'Reporte no encontrado')
+    def put(self, report_id, response_id):
+        return update_response_controller(report_id,response_id)
+
+@ns.route('/<string:report_id>/<string:response_id>/delete')
+@ns.param('report_id', 'ID del reporte correspondiente')
+@ns.param('response_id', 'ID de la respuesta que se va a eliminar')
+class ResponseDelete(Resource):
+    @ns.response(201, 'Respuesta creada exitosamente')
+    @ns.response(400, 'Solicitud inválida')
+    @ns.response(401, 'No autenticado')
+    @ns.response(403, 'Operación no permitida')
+    @ns.response(404, 'Reporte no encontrado')
+    def delete(self, report_id, response_id):
+        return delete_response_controller(report_id,response_id)
