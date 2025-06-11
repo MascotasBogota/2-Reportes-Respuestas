@@ -27,6 +27,7 @@ class ResponseCreate(Resource):
     @ns.response(403, 'Operación no permitida')
     @ns.response(404, 'Reporte no encontrado')
     def post(self, report_id):
+        """Crear una respuesta a un reporte específico."""
         return add_response_controller(report_id)
 
 @ns.route('/<string:report_id>/<string:response_id>')
@@ -36,6 +37,7 @@ class ResponseGetOne(Resource):
     @ns.response(200, 'Respuesta obtenida exitosamente')
     @ns.response(404, 'Reporte no encontrado')
     def get(self, report_id,response_id):
+        """Obtener una respuesta específica de un reporte."""
         return get_response_controller(report_id, response_id)
     
 @ns.route('/<string:report_id>/allResponses')
@@ -44,6 +46,7 @@ class ResponseGetAll(Resource):
     @ns.response(200, 'Respuesta obtenida exitosamente')
     @ns.response(404, 'Reporte no encontrado')
     def get(self, report_id):
+        """Obtener todas las respuestas de un reporte específico."""
         return get_all_responses_controller(report_id)
 
 @ns.route('/<string:report_id>/<string:response_id>/put')
@@ -57,6 +60,7 @@ class ResponseUpdate(Resource):
     @ns.response(403, 'Operación no permitida')
     @ns.response(404, 'Reporte no encontrado')
     def put(self, report_id, response_id):
+        """Actualizar una respuesta específica de un reporte."""
         return update_response_controller(report_id,response_id)
 
 @ns.route('/<string:report_id>/<string:response_id>/delete')
@@ -69,4 +73,5 @@ class ResponseDelete(Resource):
     @ns.response(403, 'Operación no permitida')
     @ns.response(404, 'Reporte no encontrado')
     def delete(self, report_id, response_id):
+        """Eliminar una respuesta específica de un reporte."""
         return delete_response_controller(report_id,response_id)
