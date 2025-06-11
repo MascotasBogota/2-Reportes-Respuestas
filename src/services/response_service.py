@@ -71,7 +71,7 @@ def update_response_service(report_id:str,response_id:str,data: dict, user_id: s
         raise ServiceError('Respuesta no encontrada')
 
     try: # verificar que el reporte este abierto
-        report = Report.objects.get(id=report_id)
+        report:Report = Report.objects.get(id=report_id)
         if report.status != 'open':
             raise ServiceError("No se pueden cambiar respuestas de un reporte cerrado")
     except DoesNotExist:
@@ -91,4 +91,20 @@ def update_response_service(report_id:str,response_id:str,data: dict, user_id: s
     return response
 
 def delete_response_service(report_id:str,response_id:str,user_id: str):
-    pass
+    try: #verificar existencia de la respuesta
+        response = Response.objects.get(id=response_id,report_id=report_id)
+    except DoesNotExist:
+        raise ServiceError('Respuesta no encontrada')
+    
+    try: # verificar que el reporte este abierto
+        report:Report = Report.objects.get(id=report_id)
+        if report.status != 'open':
+            raise ServiceError("No se pueden eliminar respuestas de un reporte cerrado")
+    except DoesNotExist:
+        raise ServiceError("Reporte no encontrado")
+    
+    if response.resp_user_id != report.user_id:
+        raise ServiceError('Usuarios solo pueden eliminar sus propias respuestas')
+    
+    response.delete()
+    return response
