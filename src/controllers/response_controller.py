@@ -14,6 +14,7 @@ def add_response_controller(report_id):
     data = request.get_json() or {}
     try:
         result = create_response_service(report_id, data, user_id)
+        print(f"Response created: {result}")
         return serialize_response(result), 201
 
     except ServiceError as se:
@@ -69,7 +70,6 @@ def update_response_controller(report_id, response_id):
         print(f"user is {user_id}")
         data = request.json
         updated_response = update_response_service(report_id,response_id,data,user_id)
-        print("after put")
         return serialize_response(updated_response)
     except ServiceError as se:
         msg = str(se)

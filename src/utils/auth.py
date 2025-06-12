@@ -22,12 +22,12 @@ def verify_jwt_token():
     token = get_jwt_token()
 
     try:
-        payload = jwt.decode(token, current_app.config['JWT_PUBLIC_KEY'], algorithms=['RS256'])
+        payload = jwt.decode(token, current_app.config['JWT_SECRET'], algorithms=['HS256'])
         return payload
     except jwt.ExpiredSignatureError:
         raise AuthError("Token expirado")
-    except jwt.InvalidTokenError:
-        raise AuthError("Token inválido")
+    except jwt.InvalidTokenError as e:
+        raise AuthError(f"Token inválido: {str(e)}")
 #def get_current_user_id():
 #    return get_jwt_identity()
 
@@ -36,9 +36,8 @@ def verify_jwt_token():
 def get_current_user_id():
     # Simula la extracción de un user_id desde un token
     payload = verify_jwt_token()
-    user = payload.get('_id', {})
-    print(f"User ID extraído del token: {user}")
-    return "user_dev_123"
+    user = payload.get('userId', {})
+    return user
 
 def jwt_required(func):
     @wraps(func)

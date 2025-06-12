@@ -35,6 +35,7 @@ def create_response_service(report_id: str, data: dict, user_id: str) -> dict:
         location=data.get('location')
     )
     resp.save()
+    print(f"Response in service created: {resp.id}")
     return resp
 
 def get_response_service(report_id: str, response_id: str) -> dict:

@@ -1,6 +1,7 @@
 from flask_restx import fields, Namespace, Resource
 from src.controllers.response_controller import add_response_controller, get_response_controller,get_all_responses_controller, update_response_controller, delete_response_controller
 from src.extensions import api
+from src.utils.auth import jwt_required
 
 ns = Namespace('responses', description='Respuestas a reportes')
 
@@ -26,6 +27,8 @@ class ResponseCreate(Resource):
     @ns.response(401, 'No autenticado')
     @ns.response(403, 'Operación no permitida')
     @ns.response(404, 'Reporte no encontrado')
+    #@jwt_required
+    #@ns.doc(security='BearerAuth')
     def post(self, report_id):
         """Crear una respuesta a un reporte específico."""
         return add_response_controller(report_id)
