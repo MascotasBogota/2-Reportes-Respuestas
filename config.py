@@ -5,7 +5,7 @@ load_dotenv()
 
 class Config:
     MONGO_URI = os.getenv("MONGO_URI")
-    JWT_PUBLIC_KEY = os.getenv("JWT_PUBLIC_KEY")
+    JWT_SECRET = os.getenv("JWT_SECRET")
     DEV_MODE = os.getenv("DEV_MODE", "False") == "True"
     SWAGGER_UI_DOC_EXPANSION = "list"
 

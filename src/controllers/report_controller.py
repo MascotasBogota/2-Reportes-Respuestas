@@ -7,7 +7,9 @@ from src.utils.serialization import serialize_report
 def create_report_controller():
     data = request.json
     user_id = get_current_user_id()
+    print(f"user id: {user_id}")
     report = report_service.create_report(data, user_id)  # ← esto debe ser un objeto Report
+    print(report)
     return serialize_report(report), 201
 
 def update_report_controller(report_id):
