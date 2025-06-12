@@ -1,5 +1,7 @@
 from flask_restx import Namespace, Resource, fields
 from src.controllers import report_controller
+from src.utils.auth import jwt_required
+
 
 ns = Namespace("reportes", description="Gestión de reportes de mascotas")
 
@@ -25,6 +27,8 @@ class ReportCreate(Resource):
     @ns.response(400, "Faltan campos obligatorios o el formato es incorrecto")
     @ns.response(401, "Token de autenticación inválido")
     @ns.response(500, "Error al crear el reporte")
+    @jwt_required
+    @ns.doc(security='Bearer Auth')
     def post(self):
         """Crear nuevo reporte"""
         return report_controller.create_report_controller()
@@ -34,11 +38,15 @@ class ReportUpdateDelete(Resource):
     #@jwt_required()
     @ns.expect(report_input)
     @ns.response(200, "Reporte actualizado")
+    @jwt_required
+    @ns.doc(security='Bearer Auth')
     def put(self, report_id):
         """Actualizar reporte propio"""
         return report_controller.update_report_controller(report_id)
 
     @ns.response(204, "Reporte eliminado")
+    @jwt_required
+    @ns.doc(security='Bearer Auth')
     def delete(self, report_id):
         """Eliminar reporte propio"""
         return report_controller.delete_report_controller(report_id)
@@ -48,6 +56,8 @@ class ReportUpdateDelete(Resource):
 class ReportClose(Resource):
     #@jwt_required()
     @ns.response(200, "Reporte cerrado exitosamente")
+    @jwt_required
+    @ns.doc(security='Bearer Auth')
     def post(self, report_id):
         """Marcar reporte como 'Encontrado'"""
         return report_controller.close_report_controller(report_id)

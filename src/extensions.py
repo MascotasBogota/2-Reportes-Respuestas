@@ -16,7 +16,6 @@ api = Api(
     version="1.0",
     description="Servicio de reportes y respuestas",
     authorizations=authorizations,
-    security='Bearer Auth'
 )
 
 def init_db(app):

@@ -27,8 +27,8 @@ class ResponseCreate(Resource):
     @ns.response(401, 'No autenticado')
     @ns.response(403, 'Operación no permitida')
     @ns.response(404, 'Reporte no encontrado')
-    #@jwt_required
-    #@ns.doc(security='BearerAuth')
+    @jwt_required
+    @ns.doc(security='Bearer Auth')
     def post(self, report_id):
         """Crear una respuesta a un reporte específico."""
         return add_response_controller(report_id)
@@ -62,6 +62,8 @@ class ResponseUpdate(Resource):
     @ns.response(401, 'No autenticado')
     @ns.response(403, 'Operación no permitida')
     @ns.response(404, 'Reporte no encontrado')
+    @jwt_required
+    @ns.doc(security='Bearer Auth')
     def put(self, report_id, response_id):
         """Actualizar una respuesta específica de un reporte."""
         return update_response_controller(report_id,response_id)
@@ -75,6 +77,8 @@ class ResponseDelete(Resource):
     @ns.response(401, 'No autenticado')
     @ns.response(403, 'Operación no permitida')
     @ns.response(404, 'Reporte no encontrado')
+    @jwt_required
+    @ns.doc(security='Bearer Auth')
     def delete(self, report_id, response_id):
         """Eliminar una respuesta específica de un reporte."""
         return delete_response_controller(report_id,response_id)
