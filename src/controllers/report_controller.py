@@ -5,34 +5,70 @@ from src.utils.auth import get_current_user_id
 from src.utils.serialization import serialize_report
 
 def create_report_controller():
-    data = request.json
-    user_id = get_current_user_id()
-    print(f"user id: {user_id}")
-    report = report_service.create_report(data, user_id)  # ← esto debe ser un objeto Report
-    print(report)
-    return serialize_report(report), 201
+    try:
+        data = request.get_json(force=True) or {}
+
+        required_fields = ['type', 'description', 'location']
+        for field in required_fields:
+            if field not in data or not data[field]:
+                abort(400, f"Falta el campo obligatorio: {field}")
+
+        user_id = get_current_user_id()
+        report = report_service.create_report(data, user_id)
+        return serialize_report(report), 201
+
+    except ValueError as ve:
+        abort(400, str(ve))
+    except Exception as e:
+        print(f"[ERROR] {e}")
+        abort(500, "Error al crear el reporte")
+
 
 def update_report_controller(report_id):
-    user_id = get_current_user_id()
-    data = request.json
-    report = report_service.update_report(report_id, data, user_id)
-    if not report:
-        abort(403, "No autorizado o el reporte no está abierto")
-    return serialize_report(report), 200
+    try:
+        user_id = get_current_user_id()
+        data = request.json or {}
+
+        if not isinstance(data, dict):
+            abort(400, "El cuerpo de la solicitud debe ser JSON")
+
+        report = report_service.update_report(report_id, data, user_id)
+        if not report:
+            abort(403, "No autorizado o el reporte no está abierto")
+        return serialize_report(report), 200
+
+    except ValueError as ve:
+        abort(400, str(ve))
+    except Exception as e:
+        print(f"Error al actualizar reporte: {e}")
+        abort(500, "Error al actualizar el reporte")
+
 
 def delete_report_controller(report_id):
-    user_id = get_current_user_id()
-    deleted = report_service.delete_report(report_id, user_id)
-    if not deleted:
-        abort(403, "No autorizado o el reporte no está abierto")
-    return '', 204
+    try:
+        user_id = get_current_user_id()
+        deleted = report_service.delete_report(report_id, user_id)
+        if not deleted:
+            abort(403, "No autorizado o el reporte no está abierto")
+        return '', 204
+
+    except Exception as e:
+        print(f"Error al eliminar reporte: {e}")
+        abort(500, "Error al eliminar el reporte")
+
 
 def close_report_controller(report_id):
-    user_id = get_current_user_id()
-    report = report_service.close_report(report_id, user_id)
-    if not report:
-        abort(403, "No autorizado o el reporte ya está cerrado")
-    return serialize_report(report), 200
+    try:
+        user_id = get_current_user_id()
+        report = report_service.close_report(report_id, user_id)
+        if not report:
+            abort(403, "No autorizado o el reporte ya está cerrado")
+        return serialize_report(report), 200
+
+    except Exception as e:
+        print(f"Error al cerrar reporte: {e}")
+        abort(500, "Error al cerrar el reporte")
+
 
 def get_filtered_reports_controller():
     from src.services import report_service

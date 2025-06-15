@@ -21,13 +21,12 @@ report_input = ns.model('ReportInput', {
 
 @ns.route("/")
 class ReportCreate(Resource):
-    #@jwt_required()
+    @jwt_required
     @ns.expect(report_input)
     @ns.response(201, "Reporte creado exitosamente")
     @ns.response(400, "Faltan campos obligatorios o el formato es incorrecto")
     @ns.response(401, "Token de autenticación inválido")
     @ns.response(500, "Error al crear el reporte")
-    @jwt_required
     @ns.doc(security='Bearer Auth')
     def post(self):
         """Crear nuevo reporte"""
@@ -35,28 +34,41 @@ class ReportCreate(Resource):
 
 @ns.route("/<string:report_id>")
 class ReportUpdateDelete(Resource):
-    #@jwt_required()
+    @jwt_required
     @ns.expect(report_input)
     @ns.response(200, "Reporte actualizado")
-    @jwt_required
+    @ns.response(400, "Formato JSON inválido o campos no permitidos")
+    @ns.response(401, "Token de autenticación inválido")
+    @ns.response(403, "No tienes permisos para editar este reporte")
+    @ns.response(404, "Reporte no encontrado")
+    @ns.response(500, "Error al actualizar el reporte")
     @ns.doc(security='Bearer Auth')
     def put(self, report_id):
         """Actualizar reporte propio"""
         return report_controller.update_report_controller(report_id)
 
-    @ns.response(204, "Reporte eliminado")
     @jwt_required
+    @ns.response(204, "Reporte eliminado")
+    @ns.response(401, "Token de autenticación inválido")
+    @ns.response(403, "No tienes permiso para eliminar este reporte")
+    @ns.response(404, "Reporte no encontrado")
+    @ns.response(500, "Error al eliminar el reporte")
     @ns.doc(security='Bearer Auth')
     def delete(self, report_id):
         """Eliminar reporte propio"""
         return report_controller.delete_report_controller(report_id)
 
 
+
 @ns.route("/<string:report_id>/close")
 class ReportClose(Resource):
-    #@jwt_required()
-    @ns.response(200, "Reporte cerrado exitosamente")
     @jwt_required
+    @ns.response(200, "Reporte cerrado exitosamente")
+    @ns.response(400, "El reporte ya está cerrado")
+    @ns.response(401, "Token de autenticación inválido")
+    @ns.response(403, "No tienes permiso para cerrar este reporte")
+    @ns.response(404, "Reporte no encontrado")
+    @ns.response(500, "Error al cerrar el reporte")
     @ns.doc(security='Bearer Auth')
     def post(self, report_id):
         """Marcar reporte como 'Encontrado'"""

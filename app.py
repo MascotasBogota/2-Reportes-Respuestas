@@ -2,7 +2,8 @@ from flask import Flask
 from config import DevelopmentConfig
 from src.extensions import api, init_db
 from src.routes.report_routes import ns as reports_ns
-from src.routes.response_routes import ns as responses_ns  # lo habilitarás más adelante
+from src.routes.response_routes import ns as responses_ns  
+from src.routes.images_routes import ns as images_ns  
 
 def create_app(config_class=DevelopmentConfig):
     app = Flask(__name__)
@@ -15,6 +16,7 @@ def create_app(config_class=DevelopmentConfig):
     # Registra los endpoints de /reports
     api.add_namespace(reports_ns, path="/reports")
     api.add_namespace(responses_ns, path="/responses")
+    api.add_namespace(images_ns, path="/images")
     return app
 
 if __name__ == "__main__":
