@@ -4,6 +4,24 @@ Este módulo proporciona los endpoints necesarios para crear, consultar y gestio
 
 ---
 
+## Tabla de contenidos
+
+- [Objetivo del módulo](#objetivo-del-módulo)
+- [Requisitos Previos](#requisitos-previos)
+- [Estructura del proyecto](#estructura-del-proyecto)
+- [Setup](#setup-del-entorno)
+- [Documentación de Endpoints](#endpoints-principales-contratos)
+
+---
+
+## Requisitos Previos
+
+- Python 3.9+
+- MongoDB Atlas (cluster creado)
+- pip
+
+---
+
 ## 🧠 Objetivo del Módulo
 
 El módulo está dividido en dos submódulos:
@@ -117,7 +135,7 @@ La siguiente sección contiene la documentación completa de todos los endpoints
 Esta API también cuenta con una documentación interactiva generada automáticamente gracias a Flask-RESTX. Puedes acceder a ella ejecutando la app y visitando:
 
 ```bash
-http://localhost:5000/
+http://localhost:5050/
 ```
 
 Desde ahí puedes:
@@ -140,17 +158,14 @@ Esto es una guía y es importante notar que las respuestas y código de errores 
 
 #### 3.1.1 Listar reportes
 
-* **Ruta:** `GET /reports`
+* **Ruta:** `GET /reports/public`
 * **Descripción:** Devuelve reportes filtrados por tipo o ubicación.
-* **Parámetros URL:** `type`, `lat`, `lng`, `radius`, `page`, `limit`
+* **Parámetros URL:** `type`, `lat`, `lng`, `radius`
 
 **Response 200 OK:**
 
 ```json
 {
-  "page": 1,
-  "limit": 20,
-  "total": 123,
   "reports": [
     {
       "id": "...",
@@ -200,7 +215,7 @@ Esto es una guía y es importante notar que las respuestas y código de errores 
 
 #### 3.1.4 Actualizar reporte
 
-* **Ruta:** `PUT /reports/{report_id}`
+* **Ruta:** `PUT /reports/public/{report_id}`
 * **Headers:** `Authorization: Bearer <token>`
 * **Body:** campos editables + `images_to_add`, `images_to_remove`
 
@@ -239,7 +254,7 @@ Esto es una guía y es importante notar que las respuestas y código de errores 
 
 #### 3.2.1 Listar respuestas
 
-* **Ruta:** `GET /reports/{report_id}/responses`
+* **Ruta:** `GET /responses/{report_id}/allResponses`
 * **Response 200 OK:**
 
 ```json
@@ -255,9 +270,28 @@ Esto es una guía y es importante notar que las respuestas y código de errores 
 
 ---
 
-#### 3.2.2 Crear respuesta
+#### 3.2.2 Obtener detalle de una respuesta
 
-* **Ruta:** `POST /reports/{report_id}/responses`
+* **Ruta:** `POST /responses/{report_id}/{response_id}`
+* **Response 200 OK:**
+
+```json
+{
+  "type": "avistamiento",
+  "comment": "...",
+  "location": { "type": "Point", "coordinates": [-74.03, 4.67] }
+}
+```
+
+**Response 200 OK:**
+
+**Errores:**  `404`, `500`
+
+---
+
+#### 3.2.3 Crear respuesta
+
+* **Ruta:** `POST /responses/{report_id}`
 * **Headers:** `Authorization: Bearer <token>`
 * **Body:**
 
@@ -270,6 +304,38 @@ Esto es una guía y es importante notar que las respuestas y código de errores 
 ```
 
 **Response 201 Created:** objeto `response`
+
+**Errores:** `400`, `401`, `403`, `404`, `500`
+
+---
+
+#### 3.2.4 Actualizar respuesta
+
+* **Ruta:** `POST /responses/{report_id}/{response_id}/put`
+* **Headers:** `Authorization: Bearer <token>`
+* **Body:**
+
+```json
+{
+  "type": "avistamiento",
+  "comment": "...",
+  "location": { "type": "Point", "coordinates": [-74.03, 4.67] }
+}
+```
+
+**Response 201 Created:** objeto `response`
+
+**Errores:** `400`, `401`, `403`, `404`, `500`
+
+---
+
+#### 3.2.5 Eliminar respuesta
+
+* **Ruta:** `POST /responses/{report_id}/{response_id}/delete`
+* **Headers:** `Authorization: Bearer <token>`
+
+**Response 201 Created:** objeto `response`
+
 **Errores:** `400`, `401`, `403`, `404`, `500`
 
 ---
@@ -282,6 +348,46 @@ Esto es una guía y es importante notar que las respuestas y código de errores 
 * **Errores:** `400` si no hay filtros, `500` error interno
 
 ---
+
+### 3.4 Imágenes
+
+#### 3.4.1 Subir imagen
+
+* **Ruta:** `POST /images/upload`
+* **Headers:** `Authorization: Bearer <token>`
+
+**Response 200 OK:** 
+
+**Errores:** `400`, `401`, `403`, `404`, `500`
+
+---
+#### 3.4.2 Obtener imagen 
+
+* **Ruta:** `POST /images/view/{filename}`
+* **Headers:** `Authorization: Bearer <token>`
+* **Body:**
+
+```json
+{
+  "filename": "filename.jpg"
+}
+```
+
+**Response 200 OK:** 
+
+**Errores:** `400`, `401`, `403`, `404`, `500`
+
+---
+
+### 3.3 Filtro de reportes
+
+#### 3.3.1 GET /reports/filter
+
+* Igual a `/reports` pero requiere al menos un parámetro de filtro.
+* **Errores:** `400` si no hay filtros, `500` error interno
+
+---
+
 
 ✅ Este documento incluye todos los contratos y ejemplos actualizados a junio de 2025. Puedes usar esta guía como referencia técnica integral para desarrollar, mantener o extender el módulo 2 del sistema PatitasBog.
 
