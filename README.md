@@ -10,7 +10,7 @@ Este módulo proporciona los endpoints necesarios para crear, consultar y gestio
 - [Requisitos Previos](#requisitos-previos)
 - [Estructura del proyecto](#estructura-del-proyecto)
 - [Setup](#setup-del-entorno)
-- [Documentación de Endpoints](#endpoints-principales-y-contratos)
+- [Documentación de Endpoints](#endpoints-principales-contratos)
 
 ---
 
