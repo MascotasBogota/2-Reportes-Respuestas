@@ -8,7 +8,7 @@ def create_report_controller():
     try:
         data = request.get_json(force=True) or {}
 
-        required_fields = ['type', 'description', 'location']
+        required_fields = ['pet_name', 'type', 'description', 'location']
         for field in required_fields:
             if field not in data or not data[field]:
                 abort(400, f"Falta el campo obligatorio: {field}")

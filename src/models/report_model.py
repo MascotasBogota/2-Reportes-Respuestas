@@ -3,6 +3,7 @@ from datetime import datetime
 
 class Report(Document):
     user_id = StringField(required=True)
+    pet_name = StringField(required=True)
     type = StringField(required=True, choices=["perro", "gato", "otro"])
     description = StringField(required=True)
     location = PointField(required=True)
