@@ -11,18 +11,15 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . /app
 
-
-
-
 # Evita que Python haga buffering de logs
 ENV PYTHONUNBUFFERED=1
 
 # Expone el puerto en el que Flask correrá (por defecto 5000)
-EXPOSE 5000
+EXPOSE 5050
 
 # Define la variable de entorno para que Flask se ejecute correctamente
 ENV FLASK_APP=app.py
 ENV FLASK_RUN_HOST=0.0.0.0
 
 # Comando para correr la aplicación
-CMD ["flask", "run","-h","0.0.0.0"]
+CMD ["python", "app.py"]

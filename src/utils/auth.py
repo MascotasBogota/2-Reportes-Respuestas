@@ -23,6 +23,7 @@ def verify_jwt_token():
 
     try:
         payload = jwt.decode(token, current_app.config['JWT_SECRET'], algorithms=['HS256'])
+        print("✅Token verificado correctamente")
         return payload
     except jwt.ExpiredSignatureError:
         raise AuthError("Token expirado")
@@ -45,6 +46,7 @@ def jwt_required(func):
         try:
             verify_jwt_token()
         except AuthError as e:
+            print(f"❌Error de autenticación: {str(e)}")
             return jsonify({"error": str(e)}), 401
         return func(*args, **kwargs)
     return decorated

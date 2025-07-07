@@ -14,11 +14,13 @@ def create_app(config_class=DevelopmentConfig):
     # Inicializa base de datos y API Swagger
     init_db(app)
     api.init_app(app)
+    print("✅MongoDB connection established successfully.")
 
     # Registra los endpoints de /reports
     api.add_namespace(reports_ns, path="/reports")
     api.add_namespace(responses_ns, path="/responses")
     api.add_namespace(images_ns, path="/images")
+    print("✨Starting the Flask application...")
     return app
 
 if __name__ == "__main__":
