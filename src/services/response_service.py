@@ -103,11 +103,7 @@ def update_response_service_patch(report_id:str,response_id:str,data: dict, user
             raise ServiceError("No se pueden cambiar respuestas de un reporte cerrado")
     except DoesNotExist:
         raise ServiceError("Reporte no encontrado")
-    
-    # verificar que el usuario sea el mismo en ambos casos
-    if docobject.resp_user_id != report.user_id:
-        raise ServiceError('Usuarios solo pueden modificar sus propias respuestas')
-    
+     
     #hacer los cambios
     for field, value in data.items():
         if hasattr(docobject, field):

@@ -26,6 +26,7 @@ def add_response_controller(report_id):
         if msg == 'Reporte no encontrado':
             return {'message': msg}, 404
         if msg == 'No se pueden agregar respuestas a un reporte cerrado':
+            print("🚫 Report closed, cannot add response")
             return {'message': msg}, 403
         if msg == 'Usuario no existe':
             return {'message': msg}, 400
@@ -100,6 +101,7 @@ def update_response_controller_patch(report_id, response_id):
         if msg == 'Reporte no encontrado' or msg == 'Respuesta no encontrada':
             return {'message': msg}, 404
         if msg == 'No se pueden cambiar respuestas de un reporte cerrado' or msg == 'Usuarios solo pueden modificar sus propias respuestas':
+            print("🚫 Cannot update response in closed report or unauthorized user")
             return {'message': msg}, 403
         if msg == 'Usuario no existe':
             return {'message': msg}, 400
