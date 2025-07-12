@@ -4,7 +4,12 @@ from functools import wraps
 #from flask_jwt_extended import get_jwt_identity
 
 class AuthError(Exception):
-    pass
+    def __init__(self, message):
+        super().__init__(message)
+        self.message = message
+
+    def __str__(self):
+        return self.message
 
 def get_jwt_token():
     auth_header = request.headers.get('Authorization', None)
