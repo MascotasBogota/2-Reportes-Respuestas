@@ -4,6 +4,7 @@ from functools import wraps
 #from flask_jwt_extended import get_jwt_identity
 
 class AuthError(Exception):
+    print("es error de autenticación")
     def __init__(self, message):
         super().__init__(message)
         self.message = message
@@ -52,6 +53,6 @@ def jwt_required(func):
             verify_jwt_token()
         except AuthError as e:
             print(f"❌Error de autenticación: {str(e)}")
-            return jsonify({"error": str(e)}), 401
+            return {"error": str(e)}, 401
         return func(*args, **kwargs)
     return decorated
