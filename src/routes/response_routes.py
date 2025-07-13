@@ -1,5 +1,5 @@
 from flask_restx import fields, Namespace, Resource
-from src.controllers.response_controller import add_response_controller, get_response_controller,get_all_responses_controller, update_response_controller, delete_response_controller
+from src.controllers.response_controller import add_response_controller, get_response_controller,get_all_responses_controller, update_response_controller, delete_response_controller,update_response_controller_patch
 from src.extensions import api
 from src.utils.auth import jwt_required
 
@@ -16,6 +16,10 @@ response_model = api.model('ResponseCreate', {
     }))
 })
 
+response_model_patch = api.model('ResponseUpdatePatch', {
+    'is_useful': fields.Boolean(required=True, description='Indica si la respuesta es útil o no', example=True),
+})
+
 
 
 @ns.route('/<string:report_id>')
@@ -30,6 +34,7 @@ class ResponseCreate(Resource):
     @jwt_required
     @ns.doc(security='Bearer Auth')
     def post(self, report_id):
+        print("Creating response for report:", report_id)
         """Crear una respuesta a un reporte específico."""
         return add_response_controller(report_id)
 
@@ -67,6 +72,22 @@ class ResponseUpdate(Resource):
     def put(self, report_id, response_id):
         """Actualizar una respuesta específica de un reporte."""
         return update_response_controller(report_id,response_id)
+    
+@ns.route('/<string:report_id>/<string:response_id>/patch')
+@ns.param('report_id', 'ID del reporte correspondiente')
+@ns.param('response_id', 'ID de la respuesta que se va a cambiar')
+class ResponseUpdatePatch(Resource):
+    @ns.expect(response_model_patch)
+    @ns.response(201, 'Respuesta creada exitosamente')
+    @ns.response(400, 'Solicitud inválida')
+    @ns.response(401, 'No autenticado')
+    @ns.response(403, 'Operación no permitida')
+    @ns.response(404, 'Reporte no encontrado')
+    @jwt_required
+    @ns.doc(security='Bearer Auth')
+    def patch(self, report_id, response_id):
+        """Actualizar una respuesta específica de un reporte."""
+        return update_response_controller_patch(report_id,response_id)
 
 @ns.route('/<string:report_id>/<string:response_id>/delete')
 @ns.param('report_id', 'ID del reporte correspondiente')

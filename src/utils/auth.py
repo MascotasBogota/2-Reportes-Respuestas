@@ -4,7 +4,13 @@ from functools import wraps
 #from flask_jwt_extended import get_jwt_identity
 
 class AuthError(Exception):
-    pass
+    print("es error de autenticación")
+    def __init__(self, message):
+        super().__init__(message)
+        self.message = message
+
+    def __str__(self):
+        return self.message
 
 def get_jwt_token():
     auth_header = request.headers.get('Authorization', None)
@@ -23,6 +29,7 @@ def verify_jwt_token():
 
     try:
         payload = jwt.decode(token, current_app.config['JWT_SECRET'], algorithms=['HS256'])
+        print("✅Token verificado correctamente")
         return payload
     except jwt.ExpiredSignatureError:
         raise AuthError("Token expirado")
@@ -45,6 +52,7 @@ def jwt_required(func):
         try:
             verify_jwt_token()
         except AuthError as e:
-            return jsonify({"error": str(e)}), 401
+            print(f"❌Error de autenticación: {str(e)}")
+            return {"error": str(e)}, 401
         return func(*args, **kwargs)
     return decorated

@@ -8,6 +8,7 @@ def create_report(data, user_id):
     try:
         return Report(
             user_id=user_id,
+            pet_name=data['pet_name'],
             type=data['type'],
             description=data['description'],
             location=data['location'],
@@ -24,6 +25,7 @@ def update_report(report_id, data, user_id):
         if not report:
             return None
 
+        report.pet_name = data.get('pet_name', report.pet_name)
         report.type = data.get('type', report.type)
         report.description = data.get('description', report.description)
         report.location = data.get('location', report.location)

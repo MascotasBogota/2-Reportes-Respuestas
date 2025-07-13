@@ -13,6 +13,7 @@ location_model = ns.model('Location', {
 
 # Esquema de entrada para creación y actualización de reportes
 report_input = ns.model('ReportInput', {
+    'pet_name': fields.String(required=True),
     'type': fields.String(required=True, enum=['perro', 'gato', 'otro']),
     'description': fields.String(required=True),
     'location': fields.Nested(location_model, required=True),

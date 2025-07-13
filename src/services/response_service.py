@@ -139,6 +139,26 @@ def update_response_service(report_id:str,response_id:str,data: dict, user_id: s
     response.save()
     return response
 
+def update_response_service_patch(report_id:str,response_id:str,data: dict, user_id: str):
+    try: #verificar existencia de la respuesta
+        docobject = Response.objects.get(id=response_id,report_id=report_id)
+    except DoesNotExist:
+        raise ServiceError('Respuesta no encontrada')
+
+    try: # verificar que el reporte este abierto
+        report:Report = Report.objects.get(id=report_id)
+        if report.status != 'open':
+            raise ServiceError("No se pueden cambiar respuestas de un reporte cerrado")
+    except DoesNotExist:
+        raise ServiceError("Reporte no encontrado")
+     
+    #hacer los cambios
+    for field, value in data.items():
+        if hasattr(docobject, field):
+            setattr(docobject, field, value)
+    docobject.save()
+    return docobject
+
 def delete_response_service(report_id:str,response_id:str,user_id: str):
     try: #verificar existencia de la respuesta
         response = Response.objects.get(id=response_id,report_id=report_id)

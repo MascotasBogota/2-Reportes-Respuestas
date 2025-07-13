@@ -1,4 +1,4 @@
-from mongoengine import Document,ListField,StringField, DateTimeField, PointField
+from mongoengine import Document,ListField,StringField, DateTimeField, PointField, BooleanField
 from datetime import datetime
 
 class Response(Document):
@@ -15,4 +15,6 @@ class Response(Document):
     comment = StringField(required=True)
     images = ListField(StringField(required=False))  # Lista de URLs de imágenes opcional
     location = PointField()  # GeoJSON Point, opcional
+    reviewed = BooleanField(default=False)  # Indica si la respuesta ha sido calificada por el usuario
+    is_useful = BooleanField(default=False)  # Indica si la respuesta es útil o no
     created_at = DateTimeField(default=datetime.now())
