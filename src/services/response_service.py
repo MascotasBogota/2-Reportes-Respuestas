@@ -3,7 +3,8 @@ from src.models.report_model import Report
 #from src.utils.auth import verify_user_exists
 from mongoengine import DoesNotExist
 import datetime as dt
-
+import requests
+import os
 
 class ServiceError(Exception): pass
 
@@ -17,7 +18,6 @@ def create_response_service(report_id: str, data: dict, user_id: str) -> dict:
         raise ServiceError('No se pueden agregar respuestas a un reporte cerrado')
     
     # Forzar imagen para hallazgos
-
     if data['type'] == 'hallazgo' and not data.get('images'):
         raise ServiceError('Los hallazgos deben incluir al menos una imagen')
 
@@ -36,7 +36,55 @@ def create_response_service(report_id: str, data: dict, user_id: str) -> dict:
     )
     resp.save()
     print(f"Response in service created: {resp.id}")
+    
+    # 4) Crear notificación para el dueño del reporte
+    try:
+        _create_notification(report_id, str(resp.id), {
+            'type': resp.type,
+            'comment': resp.comment,
+            'location': resp.location,
+            'images': resp.images,
+            'created_at': resp.created_at
+        })
+    except Exception as e:
+        print(f"Error al crear notificación: {str(e)}")
+        # No fallar si no se puede crear la notificación
+    
     return resp
+
+def _create_notification(report_id: str, response_id: str, response_data: dict):
+    """
+    Función helper para crear notificaciones
+    """
+    notifications_service_url = os.getenv('NOTIFICATIONS_SERVICE_URL', 'http://localhost:5060')
+    
+    notification_data = {
+        "report_id": report_id,
+        "response_id": response_id,
+        "response_data": {
+            "type": response_data["type"],
+            "comment": response_data["comment"],
+            "location": response_data.get("location"),
+            "images": response_data.get("images", []),
+            "created_at": response_data["created_at"].isoformat() if response_data.get("created_at") else None
+        }
+    }
+    
+    try:
+        response = requests.post(
+            f"{notifications_service_url}/notifications/webhook",
+            json=notification_data,
+            timeout=5
+        )
+        
+        if response.status_code == 201:
+            print(f"Notificación creada exitosamente para el reporte {report_id}")
+        else:
+            print(f"Error al crear notificación: {response.status_code} - {response.text}")
+            
+    except requests.RequestException as e:
+        print(f"Error de conexión al servicio de notificaciones: {str(e)}")
+        raise
 
 def get_response_service(report_id: str, response_id: str) -> dict:
     # 1) Verificar que el reporte existe 
