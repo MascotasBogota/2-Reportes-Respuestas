@@ -1,16 +1,17 @@
 # src/controllers/upload_images_controller.py
 
-import os, uuid, logging
+import os, uuid, logging, io
 from PIL import Image
 from werkzeug.utils import secure_filename
+from supabase import create_client
+from config import Config
 
-UPLOAD_FOLDER = 'uploads/report_images'
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 MAX_IMAGE_SIZE = (800, 800)
 
-def init_upload_folder():
-    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+# Initialize Supabase client
+supabase = create_client(Config.SUPABASE_URL, Config.SUPABASE_KEY)
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -30,11 +31,9 @@ def validate_file(file):
 
 def process_and_save_image(file, user_id):
     try:
-        init_upload_folder()
         ext = file.filename.rsplit('.', 1)[1].lower()
         filename = secure_filename(f"{user_id}_{uuid.uuid4().hex[:8]}.{ext}")
-        path = os.path.join(UPLOAD_FOLDER, filename)
-
+        
         image = Image.open(file)
 
         # Convertir a RGB si es necesario
@@ -49,12 +48,27 @@ def process_and_save_image(file, user_id):
         if image.size[0] > MAX_IMAGE_SIZE[0] or image.size[1] > MAX_IMAGE_SIZE[1]:
             image.thumbnail(MAX_IMAGE_SIZE, Image.Resampling.LANCZOS)
 
-        # Guardar como JPEG optimizado
-        image.save(path, 'JPEG', quality=85, optimize=True)
+        # Guardar como JPEG en un buffer en memoria
+        buffer = io.BytesIO()
+        image.save(buffer, 'JPEG', quality=85, optimize=True)
+        buffer.seek(0)
 
-        relative_url = f"/static/{UPLOAD_FOLDER}/{filename}"
-        return True, relative_url
+        # Subir la imagen a Supabase Storage
+        storage_path = f"reports/{filename}"
+        result = supabase.storage.from_(Config.SUPABASE_BUCKET).upload(
+            storage_path,
+            buffer.read(),
+            {
+                "content-type": "image/jpeg",
+                "x-upsert": "true"  # Usar upsert para evitar conflictos
+            }
+        )
+        
+        # Obtener la URL pública de la imagen
+        public_url = supabase.storage.from_(Config.SUPABASE_BUCKET).get_public_url(storage_path)
+        
+        return True, public_url
 
     except Exception as e:
-        logging.error(f"Error subiendo imagen: {e}")
-        return False, "Error interno al procesar la imagen"
+        logging.error(f"Error subiendo imagen a Supabase: {e}")
+        return False, f"Error interno al procesar la imagen {e}"

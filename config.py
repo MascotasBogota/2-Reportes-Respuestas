@@ -8,6 +8,9 @@ class Config:
     JWT_SECRET = os.getenv("JWT_SECRET")
     DEV_MODE = os.getenv("DEV_MODE", "False") == "True"
     SWAGGER_UI_DOC_EXPANSION = "list"
+    SUPABASE_URL = os.getenv("SUPABASE_URL", "https://wyuefggkaclfafqumzyc.supabase.co")
+    SUPABASE_KEY = os.getenv("SUPABASE_KEY", "sb_secret_3oZTk9WHnOfsWoTklU6sbw_NDxO7SsX")
+    SUPABASE_BUCKET = os.getenv("SUPABASE_BUCKET", "petimages")
 
 class DevelopmentConfig(Config):
     DEBUG = True
