@@ -1,6 +1,10 @@
 # 🐾 Módulo 2: Reportes y Respuestas – API de PatitasBog
 
-Este módulo proporciona los endpoints necesarios para crear, consultar y gestionar reportes de mascotas perdidas, así como registrar interacciones (respuestas de avistamiento o hallazgo) por parte de la comunidad. Forma parte del sistema **PatitasBog**, una plataforma colaborativa para ayudar a reunir mascotas con sus familias.
+Este módulo proporciona los endpoints necesarios para crear, consultar y
+gestionar reportes de mascotas perdidas, así como registrar interacciones
+(respuestas de avistamiento o hallazgo) por parte de la comunidad. Forma parte
+del sistema **PatitasBog**, una plataforma colaborativa para ayudar a reunir
+mascotas con sus familias.
 
 ---
 
@@ -26,8 +30,11 @@ Este módulo proporciona los endpoints necesarios para crear, consultar y gestio
 
 El módulo está dividido en dos submódulos:
 
-* **2.1 Reportes de mascotas perdidas**: Permite a usuarios registrar y gestionar reportes de mascotas extraviadas.
-* **2.2 Interacción y comunicación en reportes**: Facilita la colaboración entre usuarios a través de respuestas con información relevante (avistamientos o hallazgos), además de permitir filtros por tipo de mascota y geolocalización.
+- **2.1 Reportes de mascotas perdidas**: Permite a usuarios registrar y
+  gestionar reportes de mascotas extraviadas.
+- **2.2 Interacción y comunicación en reportes**: Facilita la colaboración entre
+  usuarios a través de respuestas con información relevante (avistamientos o
+  hallazgos), además de permitir filtros por tipo de mascota y geolocalización.
 
 ---
 
@@ -45,7 +52,11 @@ src/
 tests/
 🔺 TBD
 uploads/
-🔺 report_images/   # Ruta para guardar imagenes localmente (solución temporal) 
+🔺 report_images/   # (Obsoleto) Ya no se usa tras migrar a Supabase Storage
+docs/
+🔺 supabase_storage_implementation.md  # Documentación sobre implementación de Supabase
+🔺 supabase_image_upload_examples.md   # Ejemplos de código para subir imágenes a Supabase
+🔺 supabase_rls_configuration.md       # Configuración de políticas de seguridad RLS
 app.py
 config.py
 docker-compose.yml
@@ -90,6 +101,9 @@ FLASK_ENV=development
 MONGO_URI=mongodb+srv://<user>:<pass>@reportes-respuestas.mongodb.net
 JWT_PUBLIC_KEY="-----BEGIN PUBLIC KEY-----\nMIIBI...\n-----END PUBLIC KEY-----"
 DEV_MODE=True
+SUPABASE_URL=https://wyuefggkaclfafqumzyc.supabase.co
+SUPABASE_KEY=sb_secret_3oZTk9WHnOfsWoTklU6sbw_NDxO7SsX
+SUPABASE_BUCKET=petimages
 ```
 
 ### 5. Ejecutar la app
@@ -110,14 +124,41 @@ docker compose up
 
 > Esto evita problemas de dependencias cruzadas entre equipos.
 
+## 📸 Gestión de Imágenes con Supabase Storage
+
+Las imágenes ahora se almacenan en Supabase Storage en lugar del almacenamiento
+local:
+
+> **⚠️ Importante:** Para que la carga de imágenes funcione correctamente, es
+> necesario configurar las políticas de seguridad (RLS) en Supabase. Consulta la
+> [documentación de configuración RLS](./docs/supabase_rls_configuration.md)
+> para solucionar errores de permisos.
+
+```bash
+# Para migrar las imágenes existentes de almacenamiento local a Supabase
+python migrate_images_to_supabase.py
+
+# Para migrar y eliminar las imágenes locales (requiere confirmación)
+python migrate_images_to_supabase.py --delete
+
+# Para migrar y eliminar las imágenes locales sin confirmación
+python migrate_images_to_supabase.py --force-delete
+```
+
+Para más detalles, consulta la
+[documentación de implementación de Supabase Storage](./docs/supabase_storage_implementation.md).
+
 ---
 
 ## 🔐 Autenticación
 
 La mayoría de endpoints requieren un token JWT.
 
-* En **producción**, el token JWT lo almacena y es usado por el front-end tras el login.
-* Para **pruebas** o desarrollo, puedes obtener un token usando la API de login de otro equipo (consultar documentación compartida por el equipo de Autenticación).
+- En **producción**, el token JWT lo almacena y es usado por el front-end tras
+  el login.
+- Para **pruebas** o desarrollo, puedes obtener un token usando la API de login
+  de otro equipo (consultar documentación compartida por el equipo de
+  Autenticación).
 
 Incluye el token en las peticiones usando el encabezado:
 
@@ -129,10 +170,15 @@ Authorization: Bearer <token>
 
 ## 📌 Endpoints Principales y Contratos
 
-La siguiente sección contiene la documentación completa de todos los endpoints del módulo 2, incluyendo descripción, parámetros, ejemplos de request y posibles respuestas.
+La siguiente sección contiene la documentación completa de todos los endpoints
+del módulo 2, incluyendo descripción, parámetros, ejemplos de request y posibles
+respuestas.
 
 ## 📊 Documentación Swagger
-Esta API también cuenta con una documentación interactiva generada automáticamente gracias a Flask-RESTX. Puedes acceder a ella ejecutando la app y visitando:
+
+Esta API también cuenta con una documentación interactiva generada
+automáticamente gracias a Flask-RESTX. Puedes acceder a ella ejecutando la app y
+visitando:
 
 ```bash
 http://localhost:5050/
@@ -140,27 +186,28 @@ http://localhost:5050/
 
 Desde ahí puedes:
 
-* Ver todos los endpoints disponibles
+- Ver todos los endpoints disponibles
 
-* Probar llamadas a la API
+- Probar llamadas a la API
 
-* Revisar parámetros, estructuras y posibles errores
+- Revisar parámetros, estructuras y posibles errores
 
-* Compartir fácilmente con nuevos miembros del equipo
+- Compartir fácilmente con nuevos miembros del equipo
 
 ---
 
 ## 📄 Documentación de Endpoints (Contratos)
 
-Esto es una guía y es importante notar que las respuestas y código de errores pueden ser vistos en la documentación Swagger.
+Esto es una guía y es importante notar que las respuestas y código de errores
+pueden ser vistos en la documentación Swagger.
 
 ### 3.1 Reportes de mascotas perdidas
 
 #### 3.1.1 Listar reportes
 
-* **Ruta:** `GET /reports/public`
-* **Descripción:** Devuelve reportes filtrados por tipo o ubicación.
-* **Parámetros URL:** `type`, `lat`, `lng`, `radius`
+- **Ruta:** `GET /reports/public`
+- **Descripción:** Devuelve reportes filtrados por tipo o ubicación.
+- **Parámetros URL:** `type`, `lat`, `lng`, `radius`
 
 **Response 200 OK:**
 
@@ -186,9 +233,9 @@ Esto es una guía y es importante notar que las respuestas y código de errores 
 
 #### 3.1.2 Crear nuevo reporte
 
-* **Ruta:** `POST /reports`
-* **Headers:** `Authorization: Bearer <token>`
-* **Body:**
+- **Ruta:** `POST /reports`
+- **Headers:** `Authorization: Bearer <token>`
+- **Body:**
 
 ```json
 {
@@ -207,27 +254,26 @@ Esto es una guía y es importante notar que las respuestas y código de errores 
 
 #### 3.1.3 Obtener detalle de un reporte
 
-* **Ruta:** `GET /reports/{report_id}`
-* **Response 200 OK:** datos del reporte y respuestas relacionadas.
-* **Errores:** `404`, `500`
+- **Ruta:** `GET /reports/{report_id}`
+- **Response 200 OK:** datos del reporte y respuestas relacionadas.
+- **Errores:** `404`, `500`
 
 ---
 
 #### 3.1.4 Actualizar reporte
 
-* **Ruta:** `PUT /reports/public/{report_id}`
-* **Headers:** `Authorization: Bearer <token>`
-* **Body:** campos editables + `images_to_add`, `images_to_remove`
+- **Ruta:** `PUT /reports/public/{report_id}`
+- **Headers:** `Authorization: Bearer <token>`
+- **Body:** campos editables + `images_to_add`, `images_to_remove`
 
-**Response 200 OK:** datos actualizados
-**Errores:** `401`, `500`
+**Response 200 OK:** datos actualizados **Errores:** `401`, `500`
 
 ---
 
 #### 3.1.5 Eliminar reporte
 
-* **Ruta:** `DELETE /reports/{report_id}`
-* **Headers:** `Authorization: Bearer <token>`
+- **Ruta:** `DELETE /reports/{report_id}`
+- **Headers:** `Authorization: Bearer <token>`
 
 **Response 204 OK:** reporte eliminado
 
@@ -237,8 +283,8 @@ Esto es una guía y es importante notar que las respuestas y código de errores 
 
 #### 3.1.6 Cerrar reporte
 
-* **Ruta:** `POST /reports/{report_id}/close`
-* **Headers:** `Authorization: Bearer <token>`
+- **Ruta:** `POST /reports/{report_id}/close`
+- **Headers:** `Authorization: Bearer <token>`
 
 **Response 200 OK:**
 
@@ -254,15 +300,13 @@ Esto es una guía y es importante notar que las respuestas y código de errores 
 
 #### 3.2.1 Listar respuestas
 
-* **Ruta:** `GET /responses/{report_id}/allResponses`
-* **Response 200 OK:**
+- **Ruta:** `GET /responses/{report_id}/allResponses`
+- **Response 200 OK:**
 
 ```json
 {
   "report_id": "...",
-  "responses": [
-    { "id": "...", "type": "avistamiento", "comment": "..." }
-  ]
+  "responses": [{ "id": "...", "type": "avistamiento", "comment": "..." }]
 }
 ```
 
@@ -272,8 +316,8 @@ Esto es una guía y es importante notar que las respuestas y código de errores 
 
 #### 3.2.2 Obtener detalle de una respuesta
 
-* **Ruta:** `POST /responses/{report_id}/{response_id}`
-* **Response 200 OK:**
+- **Ruta:** `POST /responses/{report_id}/{response_id}`
+- **Response 200 OK:**
 
 ```json
 {
@@ -285,15 +329,15 @@ Esto es una guía y es importante notar que las respuestas y código de errores 
 
 **Response 200 OK:**
 
-**Errores:**  `404`, `500`
+**Errores:** `404`, `500`
 
 ---
 
 #### 3.2.3 Crear respuesta
 
-* **Ruta:** `POST /responses/{report_id}`
-* **Headers:** `Authorization: Bearer <token>`
-* **Body:**
+- **Ruta:** `POST /responses/{report_id}`
+- **Headers:** `Authorization: Bearer <token>`
+- **Body:**
 
 ```json
 {
@@ -311,9 +355,9 @@ Esto es una guía y es importante notar que las respuestas y código de errores 
 
 #### 3.2.4 Actualizar respuesta
 
-* **Ruta:** `POST /responses/{report_id}/{response_id}/put`
-* **Headers:** `Authorization: Bearer <token>`
-* **Body:**
+- **Ruta:** `POST /responses/{report_id}/{response_id}/put`
+- **Headers:** `Authorization: Bearer <token>`
+- **Body:**
 
 ```json
 {
@@ -331,8 +375,8 @@ Esto es una guía y es importante notar que las respuestas y código de errores 
 
 #### 3.2.5 Eliminar respuesta
 
-* **Ruta:** `POST /responses/{report_id}/{response_id}/delete`
-* **Headers:** `Authorization: Bearer <token>`
+- **Ruta:** `POST /responses/{report_id}/{response_id}/delete`
+- **Headers:** `Authorization: Bearer <token>`
 
 **Response 201 Created:** objeto `response`
 
@@ -344,8 +388,8 @@ Esto es una guía y es importante notar que las respuestas y código de errores 
 
 #### 3.3.1 GET /reports/filter
 
-* Igual a `/reports` pero requiere al menos un parámetro de filtro.
-* **Errores:** `400` si no hay filtros, `500` error interno
+- Igual a `/reports` pero requiere al menos un parámetro de filtro.
+- **Errores:** `400` si no hay filtros, `500` error interno
 
 ---
 
@@ -353,19 +397,20 @@ Esto es una guía y es importante notar que las respuestas y código de errores 
 
 #### 3.4.1 Subir imagen
 
-* **Ruta:** `POST /images/upload`
-* **Headers:** `Authorization: Bearer <token>`
+- **Ruta:** `POST /images/upload`
+- **Headers:** `Authorization: Bearer <token>`
 
-**Response 200 OK:** 
+**Response 200 OK:**
 
 **Errores:** `400`, `401`, `403`, `404`, `500`
 
 ---
-#### 3.4.2 Obtener imagen 
 
-* **Ruta:** `POST /images/view/{filename}`
-* **Headers:** `Authorization: Bearer <token>`
-* **Body:**
+#### 3.4.2 Obtener imagen
+
+- **Ruta:** `POST /images/view/{filename}`
+- **Headers:** `Authorization: Bearer <token>`
+- **Body:**
 
 ```json
 {
@@ -373,7 +418,7 @@ Esto es una guía y es importante notar que las respuestas y código de errores 
 }
 ```
 
-**Response 200 OK:** 
+**Response 200 OK:**
 
 **Errores:** `400`, `401`, `403`, `404`, `500`
 
@@ -383,12 +428,13 @@ Esto es una guía y es importante notar que las respuestas y código de errores 
 
 #### 3.3.1 GET /reports/filter
 
-* Igual a `/reports` pero requiere al menos un parámetro de filtro.
-* **Errores:** `400` si no hay filtros, `500` error interno
+- Igual a `/reports` pero requiere al menos un parámetro de filtro.
+- **Errores:** `400` si no hay filtros, `500` error interno
 
 ---
 
-
-✅ Este documento incluye todos los contratos y ejemplos actualizados a junio de 2025. Puedes usar esta guía como referencia técnica integral para desarrollar, mantener o extender el módulo 2 del sistema PatitasBog.
+✅ Este documento incluye todos los contratos y ejemplos actualizados a junio
+de 2025. Puedes usar esta guía como referencia técnica integral para
+desarrollar, mantener o extender el módulo 2 del sistema PatitasBog.
 
 ¿Dudas o sugerencias? Contacta al equipo de backend 😺
