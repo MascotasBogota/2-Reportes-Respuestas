@@ -195,7 +195,10 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> da6b9fb830659f27844cd670f6475bd3fcd67493
 simulate_webhook.py
 test_env.py
 test_report.py
