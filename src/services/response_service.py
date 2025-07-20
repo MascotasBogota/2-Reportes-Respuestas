@@ -56,7 +56,7 @@ def _create_notification(report_id: str, response_id: str, response_data: dict):
     """
     Función helper para crear notificaciones
     """
-    notifications_service_url = os.getenv('NOTIFICATIONS_SERVICE_URL', 'http://localhost:5060')
+    notifications_service_url = os.getenv('NOTIFICATIONS_SERVICE_URL', 'http://localhost:5010')
     
     notification_data = {
         "report_id": report_id,
