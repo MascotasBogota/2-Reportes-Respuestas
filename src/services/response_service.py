@@ -127,7 +127,7 @@ def update_response_service(report_id:str,response_id:str,data: dict, user_id: s
         raise ServiceError("Reporte no encontrado")
     
     # verificar que el usuario sea el mismo en ambos casos
-    if response.resp_user_id != report.user_id:
+    if response.resp_user_id != user_id:
         raise ServiceError('Usuarios solo pueden modificar sus propias respuestas')
     
     #hacer los cambios
@@ -172,7 +172,7 @@ def delete_response_service(report_id:str,response_id:str,user_id: str):
     except DoesNotExist:
         raise ServiceError("Reporte no encontrado")
     
-    if response.resp_user_id != report.user_id:
+    if response.resp_user_id != user_id:
         raise ServiceError('Usuarios solo pueden eliminar sus propias respuestas')
     
     response.delete()
