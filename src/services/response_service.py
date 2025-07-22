@@ -58,6 +58,16 @@ def _create_notification(report_id: str, response_id: str, response_data: dict):
     """
     notifications_service_url = os.getenv('NOTIFICATIONS_SERVICE_URL', 'http://localhost:5010')
     
+    # Formatear la fecha en un formato más simple que sea compatible con el servicio de notificaciones
+    created_at = None
+    if response_data.get("created_at"):
+        try:
+            # Usar formato más simple sin la T para evitar problemas de parsing
+            created_at = response_data["created_at"].strftime("%Y-%m-%d %H:%M:%S")
+        except Exception as e:
+            print(f"Error al formatear fecha: {str(e)}")
+            created_at = str(response_data["created_at"])[:19]  # Truncar microsegundos manualmente
+    
     notification_data = {
         "report_id": report_id,
         "response_id": response_id,
@@ -66,7 +76,8 @@ def _create_notification(report_id: str, response_id: str, response_data: dict):
             "comment": response_data["comment"],
             "location": response_data.get("location"),
             "images": response_data.get("images", []),
-            "created_at": response_data["created_at"].isoformat() if response_data.get("created_at") else None
+            "created_at": created_at,
+            "sighting_time": created_at
         }
     }
     
